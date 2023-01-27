@@ -1,5 +1,4 @@
 ﻿Imports System.Data.SqlClient
-Imports AutoMapper
 Imports FluentResults
 Imports S4E.ADO.Data
 Imports S4E.ADO.Models
@@ -10,11 +9,11 @@ Imports S4E.ADO.Profiles
 Namespace Services
     Public Class AssociadoService
 #Region "PROPRIEDADES"
-        Private Property _meuMapper As Profiles.Mapper
+        Private Property _meuMapper As Mapper
 #End Region
 #Region "CONSTRUTORTES"
         Public Sub New()
-            Me._meuMapper = New Profiles.Mapper
+            Me._meuMapper = New Mapper
         End Sub
 #End Region
 
@@ -107,7 +106,7 @@ Namespace Services
         End Function
         Private Sub AdicionaRelacao(connection As SQLServerConn, associadoDto As CreateAssociadoDto, id As Integer)
             Dim comando As String = ""
-            For Each empresaId In associadoDto.Empresas
+            For Each empresaId In associadoDto.EmpresasId
                 If empresaId <> 0 Then
                     comando += $"INSERT INTO ASSOCIADOEMPRESA (ASSOCIADOID, EMPRESAID) VALUES ('{id}', '{empresaId}');"
                 End If
@@ -120,7 +119,7 @@ Namespace Services
         End Sub
         Private Function RecuperaAssociadosComRelacao(connection As SQLServerConn) As ICollection(Of GetAssociadoDto)
             Dim associados As New HashSet(Of GetAssociadoDto)
-            Dim comando As String = "SELECT A.ID, A.NOME, A.CPF, A.DATADENASCIMENTO, STRING_AGG(B.ASSOCIADOID, ',') AS RELACAO FROM " +
+            Dim comando As String = "SELECT A.ID, A.NOME, A.CPF, A.DATADENASCIMENTO, STRING_AGG(B.EMPRESAID, ',') AS RELACAO FROM " +
             "ASSOCIADOS A FULL OUTER JOIN ASSOCIADOEMPRESA B ON A.ID = B.ASSOCIADOID GROUP BY A.ID, A.NOME , A.CPF, A.DATADENASCIMENTO"
             Using command As New SqlCommand(comando, connection.connDb)
                 Using myReader As SqlDataReader = command.ExecuteReader
@@ -137,7 +136,7 @@ Namespace Services
             Dim associados As New HashSet(Of GetAssociadoDto)
             Dim comando As String =
                 "SELECT ID, NOME, CPF, DATADENASCIMENTO, RELACAO FROM" +
-                " (SELECT A.ID, A.NOME, A.CPF, A.DATADENASCIMENTO, STRING_AGG(B.ASSOCIADOID, ',') AS RELACAO" +
+                " (SELECT A.ID, A.NOME, A.CPF, A.DATADENASCIMENTO, STRING_AGG(B.EMPRESAID, ',') AS RELACAO" +
                 " FROM ASSOCIADOS A FULL OUTER JOIN ASSOCIADOEMPRESA B ON A.ID = B.ASSOCIADOID GROUP BY A.ID," +
                 $" A.NOME , A.CPF, A.DATADENASCIMENTO) AS A WHERE NOME = '{nome}'"
             Using command As New SqlCommand(comando, connection.connDb)
@@ -166,7 +165,7 @@ Namespace Services
 
         Private Function RecuperaAssociadoComRelacaoPorCpf(connection As SQLServerConn, cpf As String) As GetAssociadoDto
             Dim comando As String = "SELECT ID, NOME, CPF, DATADENASCIMENTO, RELACAO FROM (SELECT A.ID, A.NOME, A.CPF, A.DATADENASCIMENTO, STRING_AGG(B.EMPRESAID, ',') AS RELACAO FROM " +
-            $"ASSOCIADOS A FULL OUTER JOIN ASSOCIADOEMPRESA B ON A.ID = B.ASSOCIADOID GROUP BY A.ID, A.NOME , A.CPF, A.DATADENASCIMENTO) AS A WHERE CPF = {cpf}"
+            $"ASSOCIADOS A FULL OUTER JOIN ASSOCIADOEMPRESA B ON A.ID = B.ASSOCIADOID GROUP BY A.ID, A.NOME , A.CPF, A.DATADENASCIMENTO) AS A WHERE CPF = '{cpf}'"
             Using command As New SqlCommand(comando, connection.connDb)
                 Using myReader As SqlDataReader = command.ExecuteReader
                     myReader.Read()

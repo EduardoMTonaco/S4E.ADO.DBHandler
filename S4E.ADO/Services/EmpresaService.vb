@@ -1,11 +1,8 @@
 ﻿Imports System.Data
-Imports System.Data.Common
 Imports System.Data.SqlClient
-Imports System.Windows.Input
 Imports FluentResults
 Imports S4E.ADO.Data
 Imports S4E.ADO.Models
-Imports S4E.ADO.Models.Dto
 Imports S4E.ADO.Models.Dto.AssociadoDto
 Imports S4E.ADO.Models.Dto.EmpresaDto
 Imports S4E.ADO.Profiles
@@ -70,15 +67,15 @@ Namespace Services
             Dim empresa As Empresa
             'Try
             empresa = RecuperaEmpresaPorId(id)
-                If empresa Is Nothing Then
-                    Return Result.Fail("Empresa não encontrada")
-                End If
-                Using conection As New SQLServerConn
-                    RemoveRelacoes(conection, id)
-                    AtualizaEmpresa(conection, empresaDto, id)
+            If empresa Is Nothing Then
+                Return Result.Fail("Empresa não encontrada")
+            End If
+            Using conection As New SQLServerConn
+                RemoveRelacoes(conection, id)
+                AtualizaEmpresa(conection, empresaDto, id)
 
-                    AdicionaRelacao(conection, empresaDto, id)
-                End Using
+                AdicionaRelacao(conection, empresaDto, id)
+            End Using
 
             'Catch ex As Exception
             'Return Result.Fail("Empresa não encontrada")
@@ -91,9 +88,9 @@ Namespace Services
                 Dim comando As String = $"DELETE FROM EMPRESAS WHERE ID = {id}"
                 RemoveRelacoes(conection, id)
                 Using command As New SqlCommand(comando, conection.connDb)
-                        command.ExecuteNonQuery()
+                    command.ExecuteNonQuery()
 
-                    End Using
+                End Using
                 'Catch
                 'Return Result.Fail("Empresa não encontrada")
                 'End Try
@@ -124,8 +121,8 @@ Namespace Services
         End Sub
         Private Function RecuperaEmpresasComRelacao(connection As SQLServerConn) As ICollection(Of GetEmpresaDto)
             Dim empresas As New HashSet(Of GetEmpresaDto)
-            Dim comando As String = "SELECT A.ID, A.NOME, A.CPF, STRING_AGG(B.EMPRESAID, ',') AS RELACAO FROM " +
-            "ASSOCIADOS A FULL OUTER JOIN ASSOCIADOEMPRESA B ON A.ID = B.ASSOCIADOID GROUP BY A.ID, A.NOME , A.CPF"
+            Dim comando As String = "SELECT A.ID, A.NOME, A.CNPJ, STRING_AGG(B.ASSOCIADOID, ',') AS RELACAO FROM " +
+            "EMPRESAS A FULL OUTER JOIN ASSOCIADOEMPRESA B ON A.ID = B.EMPRESAID GROUP BY A.ID, A.NOME , A.CNPJ"
             Using command As New SqlCommand(comando, connection.connDb)
                 Using myReader As SqlDataReader = command.ExecuteReader
                     While myReader.Read()
@@ -140,7 +137,7 @@ Namespace Services
             Dim empresas As New HashSet(Of GetEmpresaDto)
             Dim comando As String = "SELECT ID, NOME, CNPJ, RELACAO FROM (SELECT A.ID, A.NOME, A.CNPJ, STRING_AGG(B.ASSOCIADOID, ',')" +
                 $"AS RELACAO FROM EMPRESAS A FULL OUTER JOIN ASSOCIADOEMPRESA B ON A.ID = B.EMPRESAID GROUP BY A.ID, A.NOME , A.CNPJ)" +
-                " AS A WHERE NOME = '{nome}'"
+                $" AS A WHERE NOME = '{nome}'"
             Using command As New SqlCommand(comando, connection.connDb)
                 Using myReader As SqlDataReader = command.ExecuteReader
                     While myReader.Read()
@@ -152,7 +149,7 @@ Namespace Services
         End Function
 
         Private Function RecuperaEmpresaComRelacaoPorId(connection As SQLServerConn, id As Integer) As GetEmpresaDto
-            Dim comando As String = "SELECT ID, NOME, CNPJ, RELACAO FROM (SELECT A.ID, A.NOME, A.CNPJ, STRING_AGG(B.EMPRESAID, ',') AS RELACAO FROM " +
+            Dim comando As String = "SELECT ID, NOME, CNPJ, RELACAO FROM (SELECT A.ID, A.NOME, A.CNPJ, STRING_AGG(B.ASSOCIADOID, ',') AS RELACAO FROM " +
             $"EMPRESAS A FULL OUTER JOIN ASSOCIADOEMPRESA B ON A.ID = B.EMPRESAID GROUP BY A.ID, A.NOME , A.CNPJ)AS A WHERE ID = {id}"
             Using command As New SqlCommand(comando, connection.connDb)
                 Using myReader As SqlDataReader = command.ExecuteReader
@@ -163,7 +160,7 @@ Namespace Services
         End Function
 
         Private Function RecuperaEmpresaComRelacaoPorCnpj(connection As SQLServerConn, cnpj As String) As GetEmpresaDto
-            Dim comando As String = "SELECT ID, NOME, CNPJ, RELACAO FROM (SELECT A.ID, A.NOME, A.CNPJ, STRING_AGG(B.EMPRESAID, ',') AS RELACAO FROM " +
+            Dim comando As String = "SELECT ID, NOME, CNPJ, RELACAO FROM (SELECT A.ID, A.NOME, A.CNPJ, STRING_AGG(B.ASSOCIADOID, ',') AS RELACAO FROM " +
             $"EMPRESAS A FULL OUTER JOIN ASSOCIADOEMPRESA B ON A.ID = B.EMPRESAID GROUP BY A.ID, A.NOME , A.CNPJ)AS A WHERE CNPJ = '{cnpj}'"
             Using command As New SqlCommand(comando, connection.connDb)
                 Using myReader As SqlDataReader = command.ExecuteReader
@@ -218,7 +215,7 @@ Namespace Services
                     End Using
                 End Using
             End If
-            Return Empresa
+            Return empresa
         End Function
 
 #End Region

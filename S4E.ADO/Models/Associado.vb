@@ -1,17 +1,20 @@
-﻿Imports S4E.ADO.Models.Dto
-Imports S4E.ADO.Models.Dto.AssociadoDto
+﻿Imports System.ComponentModel.DataAnnotations
 Imports S4E.ADO.Models.Dto.EmpresaDto
 
 Namespace Models
 
-
     Public Class Associado
 
-        Public id As Integer
-        Public Nome As String
-        Public Cpf As String
-        Public DataDeNascimento As DateTime
-        Public Empresas As ICollection(Of ReadEmpresaDto)
+        <Required>
+        Public Property id As Integer
+        <Required>
+        <MaxLength(200, ErrorMessage:="O nome não pode ter mais de 200 caracteres")>
+        Public Property Nome As String
+        <Required>
+        <StringLength(11, ErrorMessage:="O CPF deve ter 11 caracteres")>
+        Public Property Cpf As String
+        Public Property DataDeNascimento As DateTime
+        Public Property Empresas As ICollection(Of ReadEmpresaDto)
 
         Public Sub New()
             Empresas = New HashSet(Of ReadEmpresaDto)
