@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "S4E.ADO", "S4E.ADO\S4E.ADO.vbproj", "{B8F5D64E-BD6A-4A56-B06C-9DD6C4990534}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "S4E.ADO.DBHandler", "S4E.ADO\S4E.ADO.DBHandler.vbproj", "{B8F5D64E-BD6A-4A56-B06C-9DD6C4990534}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "TestesSQLDb", "..\TestesSQLDb\TestesSQLDb.vbproj", "{A121DDAC-0DCA-471E-AA8B-C6018D5EE508}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "S4E.ADO.TESTES", "..\TestesSQLDb\S4E.ADO.TESTES.vbproj", "{A121DDAC-0DCA-471E-AA8B-C6018D5EE508}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "S4E.ADO.API", "S4E.API\S4E.ADO.API.csproj", "{FC4AD6E8-3FFD-413B-A2E7-BCECDD192869}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{A121DDAC-0DCA-471E-AA8B-C6018D5EE508}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A121DDAC-0DCA-471E-AA8B-C6018D5EE508}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A121DDAC-0DCA-471E-AA8B-C6018D5EE508}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC4AD6E8-3FFD-413B-A2E7-BCECDD192869}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC4AD6E8-3FFD-413B-A2E7-BCECDD192869}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC4AD6E8-3FFD-413B-A2E7-BCECDD192869}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC4AD6E8-3FFD-413B-A2E7-BCECDD192869}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

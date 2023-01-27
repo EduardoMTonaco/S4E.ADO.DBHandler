@@ -1,4 +1,5 @@
 ﻿Imports System.Data.SqlClient
+Imports AutoMapper
 Imports FluentResults
 Imports S4E.ADO.Data
 Imports S4E.ADO.Models
@@ -9,13 +10,11 @@ Imports S4E.ADO.Profiles
 Namespace Services
     Public Class AssociadoService
 #Region "PROPRIEDADES"
-        Private _context As SQLServerConn
-        Private _mapper As Mapper
+        Private Property _meuMapper As Profiles.Mapper
 #End Region
 #Region "CONSTRUTORTES"
         Public Sub New()
-            _context = New SQLServerConn()
-            _mapper = New Mapper
+            Me._meuMapper = New Profiles.Mapper
         End Sub
 #End Region
 
@@ -79,7 +78,7 @@ Namespace Services
 
             Catch ex As Exception
                 Throw New Exception("Nao existe")
-            Return Result.Fail("Associado não encontrado")
+                Return Result.Fail("Associado não encontrado")
             End Try
             Return Result.Ok
         End Function
@@ -89,8 +88,8 @@ Namespace Services
                 Dim comando As String = $"DELETE FROM ASSOCIADOS WHERE ID = {id}"
                 RemoveRelacoes(conection, id)
                 Using command As New SqlCommand(comando, conection.connDb)
-                        command.ExecuteNonQuery()
-                    End Using
+                    command.ExecuteNonQuery()
+                End Using
                 'Catch
                 ' Return Result.Fail("Associado não encontrado")
                 ' End Try
@@ -126,7 +125,7 @@ Namespace Services
             Using command As New SqlCommand(comando, connection.connDb)
                 Using myReader As SqlDataReader = command.ExecuteReader
                     While myReader.Read()
-                        associados.Add(_mapper.MapGetAssociadoDto(myReader))
+                        associados.Add(_meuMapper.MapGetAssociadoDto(myReader))
                     End While
                     myReader.Close()
                 End Using
@@ -144,7 +143,7 @@ Namespace Services
             Using command As New SqlCommand(comando, connection.connDb)
                 Using myReader As SqlDataReader = command.ExecuteReader
                     While myReader.Read()
-                        associados.Add(_mapper.MapGetAssociadoDto(myReader))
+                        associados.Add(_meuMapper.MapGetAssociadoDto(myReader))
                     End While
                     myReader.Close()
                 End Using
@@ -158,7 +157,7 @@ Namespace Services
             Using command As New SqlCommand(comando, connection.connDb)
                 Using myReader As SqlDataReader = command.ExecuteReader
                     myReader.Read()
-                    Dim getAssociado As GetAssociadoDto = _mapper.MapGetAssociadoDto(myReader)
+                    Dim getAssociado As GetAssociadoDto = _meuMapper.MapGetAssociadoDto(myReader)
                     myReader.Close()
                     Return getAssociado
                 End Using
@@ -171,7 +170,7 @@ Namespace Services
             Using command As New SqlCommand(comando, connection.connDb)
                 Using myReader As SqlDataReader = command.ExecuteReader
                     myReader.Read()
-                    Dim getAssociado As GetAssociadoDto = _mapper.MapGetAssociadoDto(myReader)
+                    Dim getAssociado As GetAssociadoDto = _meuMapper.MapGetAssociadoDto(myReader)
                     myReader.Close()
                     Return getAssociado
                 End Using
@@ -184,7 +183,7 @@ Namespace Services
             Using command As New SqlCommand(comando, connection.connDb)
                 Using myReader As SqlDataReader = command.ExecuteReader
                     myReader.Read()
-                    Dim getAssociado As GetAssociadoDto = _mapper.MapGetAssociadoDto(myReader)
+                    Dim getAssociado As GetAssociadoDto = _meuMapper.MapGetAssociadoDto(myReader)
                     myReader.Close()
                     Return getAssociado
                 End Using
@@ -207,7 +206,7 @@ Namespace Services
         Private Function RecuperaEmpresas(connection As SQLServerConn, associadoDto As GetAssociadoDto) As Associado
             Dim empresasId = associadoDto.Empresas
             Dim condicao As String = " WHERE"
-            Dim associado As Associado = _mapper.MapAssociado(associadoDto)
+            Dim associado As Associado = _meuMapper.MapAssociado(associadoDto)
             If empresasId(0) <> 0 Then
                 For Each i In empresasId
                     condicao += $" ID = {i} OR"
@@ -218,7 +217,7 @@ Namespace Services
                     Using myReader As SqlDataReader = command.ExecuteReader
                         While myReader.Read()
                             Dim associadoId As Integer = myReader.GetInt32(0)
-                            Dim empresa As ReadEmpresaDto = _mapper.MapReadEmpresaDto(myReader)
+                            Dim empresa As ReadEmpresaDto = _meuMapper.MapReadEmpresaDto(myReader)
                             associado.Empresas.Add(empresa)
                         End While
                         myReader.Close()
