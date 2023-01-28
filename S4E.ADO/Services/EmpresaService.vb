@@ -1,8 +1,10 @@
 ﻿Imports System.Data
+Imports System.Data.Common
 Imports System.Data.SqlClient
 Imports FluentResults
 Imports S4E.ADO.Data
 Imports S4E.ADO.Models
+Imports S4E.ADO.Models.Dto
 Imports S4E.ADO.Models.Dto.AssociadoDto
 Imports S4E.ADO.Models.Dto.EmpresaDto
 Imports S4E.ADO.Profiles
@@ -56,6 +58,9 @@ Namespace Services
             Using conection As New SQLServerConn
                 Dim empresasDto As HashSet(Of GetEmpresaDto) = RecuperaEmpresasComRelacaoPorNome(conection, nome)
                 Dim empresas As New HashSet(Of Empresa)
+                If empresasDto.Count = 0 Then
+                    Throw New ArgumentNullException(NameOf(nome), "Nenhuma empresa encontrado.")
+                End If
                 For Each getEmpresaDto In empresasDto
                     empresas.Add(RecuperaAssociados(conection, getEmpresaDto))
                 Next
@@ -65,35 +70,31 @@ Namespace Services
 
         Public Function AtualizaEmpresa(id As Integer, empresaDto As CreateEmpresaDto) As Result
             Dim empresa As Empresa
-            'Try
-            empresa = RecuperaEmpresaPorId(id)
-            If empresa Is Nothing Then
-                Return Result.Fail("Empresa não encontrada")
-            End If
-            Using conection As New SQLServerConn
-                RemoveRelacoes(conection, id)
-                AtualizaEmpresa(conection, empresaDto, id)
+            Try
+                empresa = RecuperaEmpresaPorId(id)
+                If empresa Is Nothing Then
+                    Return Result.Fail("Empresa não encontrada")
+                End If
+                Using conection As New SQLServerConn
+                    RemoveRelacoes(conection, id)
+                    AtualizaEmpresa(conection, empresaDto, id)
 
-                AdicionaRelacao(conection, empresaDto, id)
-            End Using
+                    AdicionaRelacao(conection, empresaDto, id)
+                End Using
+                Return Result.Ok
+            Catch ex As Exception
+                Return Result.Fail(ex.Message)
+            End Try
 
-            'Catch ex As Exception
-            'Return Result.Fail("Empresa não encontrada")
-            'End Try
-            Return Result.Ok
         End Function
         Public Function DeletaEmpresa(id As Integer) As Result
             Using conection As New SQLServerConn
-                'Try
                 Dim comando As String = $"DELETE FROM EMPRESAS WHERE ID = {id}"
                 RemoveRelacoes(conection, id)
                 Using command As New SqlCommand(comando, conection.connDb)
                     command.ExecuteNonQuery()
 
                 End Using
-                'Catch
-                'Return Result.Fail("Empresa não encontrada")
-                'End Try
             End Using
             Return Result.Ok
         End Function
@@ -101,9 +102,16 @@ Namespace Services
 
 #Region "METODOS PRIVADOS"
         Private Function AdicionaEmpresa(conection As SQLServerConn, empresaDto As CreateEmpresaDto) As Integer
+            If empresaDto.Cnpj.Length <> 14 Then
+                Throw New ArgumentException("CNPJ deve conter 14 digitos", NameOf(empresaDto.Cnpj))
+            End If
             Dim comando As String = $"INSERT INTO EMPRESAS (NOME, CNPJ) VALUES ('{empresaDto.Nome}','{empresaDto.Cnpj}'); SELECT SCOPE_IDENTITY()"
             Using command As New SqlCommand(comando, conection.connDb)
-                Return command.ExecuteScalar()
+                Try
+                    Return command.ExecuteScalar()
+                Catch
+                    Throw New ArgumentException("Não pode cadastrar empresas com o CNPJ duplicado")
+                End Try
             End Using
         End Function
         Private Sub AdicionaRelacao(connection As SQLServerConn, empresaDto As CreateEmpresaDto, id As Integer)

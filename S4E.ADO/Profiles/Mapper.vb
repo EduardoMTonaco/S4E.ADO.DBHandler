@@ -1,4 +1,5 @@
 ﻿Imports System.Data
+Imports System.Data.Common
 Imports System.Data.SqlClient
 Imports S4E.ADO.Models
 Imports S4E.ADO.Models.Dto
@@ -8,6 +9,8 @@ Imports S4E.ADO.Models.Dto.EmpresaDto
 Namespace Profiles
     Public Class Mapper
         Public Function MapAssociado(dataReader As SqlDataReader) As Associado
+            VerificaId(dataReader)
+
             Return New Associado With {
                             .id = dataReader.GetInt32(0),
                             .Nome = dataReader.GetString(1),
@@ -17,13 +20,15 @@ Namespace Profiles
         End Function
 
         Public Function MapEmpresa(dataReader As SqlDataReader) As Empresa
+            VerificaId(dataReader)
             Return New Empresa With {
                             .Id = dataReader.GetInt32(0),
                             .Nome = dataReader.GetString(1),
-                            .CNPJ = dataReader.GetString(2)
+                            .Cnpj = dataReader.GetString(2)
                         }
         End Function
         Public Function MapReadAssociadoDto(dataReader As SqlDataReader) As ReadAssociadoDto
+            VerificaId(dataReader)
             Dim associadoDto As New ReadAssociadoDto With {
                             .id = dataReader.GetInt32(0),
                             .Nome = dataReader.GetString(1),
@@ -36,6 +41,7 @@ Namespace Profiles
         End Function
 
         Public Function MapReadEmpresaDto(dataReader As SqlDataReader) As ReadEmpresaDto
+            VerificaId(dataReader)
             Return New ReadEmpresaDto With {
                             .Id = dataReader.GetInt32(0),
                             .Nome = dataReader.GetString(1),
@@ -44,6 +50,7 @@ Namespace Profiles
         End Function
 
         Public Function MapGetEmpresaDto(dataReader As SqlDataReader) As GetEmpresaDto
+            VerificaId(dataReader)
             Dim empresa As New GetEmpresaDto With {
                             .Id = dataReader.GetInt32(0),
                             .Nome = dataReader.GetString(1),
@@ -61,6 +68,7 @@ Namespace Profiles
         End Function
 
         Public Function MapGetAssociadoDto(dataReader As SqlDataReader) As GetAssociadoDto
+            VerificaId(dataReader)
             Dim associado As New GetAssociadoDto With {
                             .Id = dataReader.GetInt32(0),
                             .Nome = dataReader.GetString(1),
@@ -85,7 +93,7 @@ Namespace Profiles
             Return New Empresa With {
                 .Id = getEmpresaDto.Id,
                 .Nome = getEmpresaDto.Nome,
-                .CNPJ = getEmpresaDto.Cnpj
+                .Cnpj = getEmpresaDto.Cnpj
             }
         End Function
 
@@ -98,6 +106,12 @@ Namespace Profiles
             }
         End Function
 
+
+        Private Sub VerificaId(dataReader As SqlDataReader)
+            If dataReader.IsDBNull(0) Then
+                Throw New ArgumentNullException("Id", "Cliente não localizado.")
+            End If
+        End Sub
     End Class
 End Namespace
 

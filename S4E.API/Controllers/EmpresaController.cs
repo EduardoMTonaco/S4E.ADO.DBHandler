@@ -18,58 +18,137 @@ namespace S4E.ADO.API.Controllers
         [HttpGet("id/{id}")]
         public IActionResult RecuperaEmpresaPorId(int id)
         {
-            Empresa empresa = _empresaService.RecuperaEmpresaPorId(id);
-            if (empresa == null)
+            try
             {
-                return NotFound();
+                Empresa empresa = _empresaService.RecuperaEmpresaPorId(id);
+                if (empresa == null)
+                {
+                    return NotFound();
+                }
+                return Ok(empresa);
             }
-            return Ok(empresa);
+            catch (ArgumentNullException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
         [HttpPost()]
         public IActionResult AdicionaEmpresa([FromBody] CreateEmpresaDto empresaDto)
         {
-            Empresa empresa = _empresaService.AdicionaEmpresa(empresaDto);
-            return CreatedAtAction(nameof(RecuperaEmpresaPorId), new {id = empresa.Id }, empresa);
+            try
+            {
+                Empresa empresa = _empresaService.AdicionaEmpresa(empresaDto);
+                return CreatedAtAction(nameof(RecuperaEmpresaPorId), new { id = empresa.Id }, empresa);
+            }
+            catch (ArgumentNullException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         [HttpGet]
-        public IEnumerable<Empresa> RecuperaEmpresas()
+        public IActionResult RecuperaEmpresas()
         {
-            return _empresaService.RecuperaEmpresas();
+            try
+            {
+                return Ok(_empresaService.RecuperaEmpresas());
+            }
+            catch (ArgumentNullException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
         [HttpGet("nome/{nome}")]
-        public IEnumerable<Empresa> RecuperempresasPorNome(string nome)
+        public IActionResult RecuperempresasPorNome(string nome)
         {
-            return _empresaService.RecuperaEmpresasPorNome(nome);
+            try
+            {
+                return Ok(_empresaService.RecuperaEmpresasPorNome(nome));
+            }
+            catch (ArgumentNullException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
         [HttpGet("cnpj/{cnpj}")]
         public IActionResult RecuperaEmpresaporCpf(string cnpj)
         {
-            Empresa empresa = _empresaService.RecuperaEmpresaPorCnpj(cnpj);
-            if (empresa == null)
+            try
             {
-                return new NotFoundObjectResult(empresa);
+                Empresa empresa = _empresaService.RecuperaEmpresaPorCnpj(cnpj);
+                if (empresa == null)
+                {
+                    return new NotFoundObjectResult(empresa);
+                }
+                return new OkObjectResult(empresa);
             }
-            return new OkObjectResult(empresa);
+            catch (ArgumentNullException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+           
         }
         [HttpPost("{id}")]
         public IActionResult AtualizaEmpresa(int id, [FromBody] CreateEmpresaDto empresaDto)
         {
-            Result resultado = _empresaService.AtualizaEmpresa(id, empresaDto);
-            if (resultado.IsFailed)
+            try
             {
-                return new NotFoundResult();
+                Result resultado = _empresaService.AtualizaEmpresa(id, empresaDto);
+                if (resultado.IsFailed)
+                {
+                    return new NotFoundResult();
+                }
+                return new NoContentResult();
             }
-            return new NoContentResult();
+            catch (ArgumentNullException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+           
         }
         [HttpDelete("id")]
         public IActionResult DeletaEmpresa(int id)
         {
-            Result resultado = _empresaService.DeletaEmpresa(id);
-            if (resultado.IsFailed)
+            try
             {
-                return new NotFoundResult();
+                Result resultado = _empresaService.DeletaEmpresa(id);
+                if (resultado.IsFailed)
+                {
+                    return new NotFoundResult();
+                }
+                return new NoContentResult();
             }
-            return new NoContentResult();
+            catch (ArgumentNullException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
     }
 }

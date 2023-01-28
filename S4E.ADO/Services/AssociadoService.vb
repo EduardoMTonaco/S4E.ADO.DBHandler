@@ -53,6 +53,9 @@ Namespace Services
             Using conection As New SQLServerConn
                 Dim associadosDto As HashSet(Of GetAssociadoDto) = RecuperaAssociadosComRelacaoPorNome(conection, nome)
                 Dim associados As New HashSet(Of Associado)
+                If associadosDto.Count = 0 Then
+                    Throw New ArgumentNullException(NameOf(nome), "Nenhum associado encontrado.")
+                End If
                 For Each getEmpresaDto In associadosDto
                     associados.Add(RecuperaEmpresas(conection, getEmpresaDto))
                 Next
@@ -65,43 +68,40 @@ Namespace Services
             Dim associado As Associado
             Try
                 associado = RecuperaAssociadoPorId(id)
-                If associado Is Nothing Then
-                    Throw New Exception("associadovazio")
-                    Return Result.Fail("Associado não encontrado")
-                End If
                 Using conection As New SQLServerConn
                     RemoveRelacoes(conection, id)
                     AtualizaAssociado(conection, associadoDto, id)
                     AdicionaRelacao(conection, associadoDto, id)
+                    Return Result.Ok
                 End Using
-
             Catch ex As Exception
-                Throw New Exception("Nao existe")
-                Return Result.Fail("Associado não encontrado")
+                Return Result.Fail(ex.Message)
             End Try
-            Return Result.Ok
         End Function
         Public Function DeletaAssociado(id As Integer) As Result
             Using conection As New SQLServerConn
-                'Try
                 Dim comando As String = $"DELETE FROM ASSOCIADOS WHERE ID = {id}"
                 RemoveRelacoes(conection, id)
                 Using command As New SqlCommand(comando, conection.connDb)
                     command.ExecuteNonQuery()
                 End Using
-                'Catch
-                ' Return Result.Fail("Associado não encontrado")
-                ' End Try
             End Using
             Return Result.Ok
         End Function
 #End Region
 #Region "METODOS PRIVADOS"
         Private Function AdicionaAssociado(conection As SQLServerConn, associadoDto As CreateAssociadoDto) As Integer
+            If associadoDto.Cpf.Length <> 11 Then
+                Throw New ArgumentException("CPF deve conter 11 digitos", NameOf(associadoDto.Cpf))
+            End If
             Dim comando As String = "INSERT INTO ASSOCIADOS (NOME, CPF, DATADENASCIMENTO)" +
                 $" VALUES ('{associadoDto.Nome}','{associadoDto.Cpf}', '{associadoDto.DataDeNascimento}'); SELECT SCOPE_IDENTITY()"
             Using command As New SqlCommand(comando, conection.connDb)
-                Return command.ExecuteScalar()
+                Try
+                    Return command.ExecuteScalar()
+                Catch
+                    Throw New ArgumentException("Não pode registrar associados com CPF duplicado.")
+                End Try
             End Using
         End Function
         Private Sub AdicionaRelacao(connection As SQLServerConn, associadoDto As CreateAssociadoDto, id As Integer)
