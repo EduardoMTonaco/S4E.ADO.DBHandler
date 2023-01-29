@@ -6,7 +6,7 @@ Namespace Models
     Public Class Associado
 
         <Required>
-        Public Property id As Integer
+        Public Property Id As Integer
         <Required>
         <MaxLength(200, ErrorMessage:="O nome não pode ter mais de 200 caracteres")>
         Public Property Nome As String

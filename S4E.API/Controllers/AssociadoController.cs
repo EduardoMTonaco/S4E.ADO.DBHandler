@@ -1,10 +1,8 @@
-﻿using AutoMapper;
-using FluentResults;
+﻿using FluentResults;
 using Microsoft.AspNetCore.Mvc;
 using S4E.ADO.Models;
 using S4E.ADO.Models.Dto.AssociadoDto;
 using S4E.ADO.Services;
-using System.Text.Json;
 
 namespace S4E.API.Controllers
 {
@@ -13,7 +11,7 @@ namespace S4E.API.Controllers
     public class AssociadoController : Controller
     {
         private AssociadoService _associadoService;
-        public AssociadoController(AssociadoService associadoService ) 
+        public AssociadoController(AssociadoService associadoService)
         {
             _associadoService = associadoService;
         }
@@ -46,7 +44,7 @@ namespace S4E.API.Controllers
             try
             {
                 Associado associado = _associadoService.AdicionaAssociado(associadoDto);
-                return CreatedAtAction(nameof(RecuperaAssociadoPorId), new { id = associado.id }, associado);
+                return CreatedAtAction(nameof(RecuperaAssociadoPorId), new { id = associado.Id }, associado);
             }
             catch (ArgumentException ex)
             {
@@ -75,7 +73,7 @@ namespace S4E.API.Controllers
                 string mensagemDeErro = ex.Message.Remove(ex.Message.IndexOf("("));
                 return BadRequest(mensagemDeErro);
             }
-            
+
         }
         [HttpGet("cpf/{cpf}")]
         public IActionResult RecuperaAssociadoporCpf(string cpf)
@@ -102,7 +100,7 @@ namespace S4E.API.Controllers
 
         }
         [HttpPost("{id}")]
-        public IActionResult AtualizaAssociado(int id, [FromBody]CreateAssociadoDto associadoDto)
+        public IActionResult AtualizaAssociado(int id, [FromBody] CreateAssociadoDto associadoDto)
         {
             try
             {

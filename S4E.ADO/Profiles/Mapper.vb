@@ -12,7 +12,7 @@ Namespace Profiles
             VerificaId(dataReader)
 
             Return New Associado With {
-                            .id = dataReader.GetInt32(0),
+                            .Id = dataReader.GetInt32(0),
                             .Nome = dataReader.GetString(1),
                             .Cpf = dataReader.GetString(2),
                             .DataDeNascimento = dataReader.GetDateTime(3)
@@ -30,7 +30,7 @@ Namespace Profiles
         Public Function MapReadAssociadoDto(dataReader As SqlDataReader) As ReadAssociadoDto
             VerificaId(dataReader)
             Dim associadoDto As New ReadAssociadoDto With {
-                            .id = dataReader.GetInt32(0),
+                            .Id = dataReader.GetInt32(0),
                             .Nome = dataReader.GetString(1),
                             .Cpf = dataReader.GetString(2)
                         }
@@ -99,7 +99,7 @@ Namespace Profiles
 
         Public Function MapAssociado(getAssociadoDto As GetAssociadoDto) As Associado
             Return New Associado With {
-                .id = getAssociadoDto.Id,
+                .Id = getAssociadoDto.Id,
                 .Nome = getAssociadoDto.Nome,
                 .Cpf = getAssociadoDto.Cpf,
                 .DataDeNascimento = getAssociadoDto.DataDeNascimento
